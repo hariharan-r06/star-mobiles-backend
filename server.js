@@ -11,6 +11,7 @@ import bookingsRoutes from './routes/bookings.js';
 import productsRoutes from './routes/products.js';
 import cartRoutes from './routes/cart.js';
 import uploadRoutes from './routes/upload.js';
+import ordersRoutes from './routes/orders.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -75,6 +76,7 @@ app.use('/api/bookings', bookingsRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/orders', ordersRoutes);
 
 // 404 handler
 app.use((req, res) => {
