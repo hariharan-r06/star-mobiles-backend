@@ -394,6 +394,49 @@ router.get('/me', async (req, res) => {
 });
 
 /**
+ * GET /api/auth/profile
+ * Get current user profile using admin client (reliably fetches admin role)
+ */
+router.get('/profile', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        // Use admin client to verify token and get user
+        const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+
+        if (error || !user) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        // Fetch profile using admin client (bypasses RLS)
+        const { data: profile, error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        console.log('Profile endpoint - returning profile with role:', profile?.role);
+
+        res.json({ success: true, profile });
+
+    } catch (error) {
+        console.error('Get user error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+/**
  * PUT /api/auth/profile
  * Update user profile
  */

@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js';
 import bookingsRoutes from './routes/bookings.js';
 import productsRoutes from './routes/products.js';
 import cartRoutes from './routes/cart.js';
+import uploadRoutes from './routes/upload.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,7 +41,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+// Increase body size limit for image uploads (10MB)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -71,6 +74,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler
 app.use((req, res) => {
